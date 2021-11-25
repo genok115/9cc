@@ -16,11 +16,28 @@ assert() {
   fi
 }
 
+assertfail() {
+  expected="$1"
+  input="$2"
+
+  echo "error expected with \"$input\""
+  ./9cc "$input" > /dev/null
+
+  if [ $? -eq 0 ]; then
+    echo "error expected, but got succeeded."
+    exit 1
+  else 
+    return 0;
+  fi
+}
+
 assert 0 0
 assert 42 42
 assert 21 "5+20-4"
 assert 2 "0 - 3 + 5"
 assert 41 " 12 + 34 - 5 "
+assertfail 4 "1+3++"
+assertfail 6 "1 + foo + 5"
 
 echo OK
 
