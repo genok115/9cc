@@ -214,13 +214,14 @@ Node *mul() {
 }
 
 // 単項-・単項+
+// unary = ("+" | "-")? unary
 Node *unary() {
   // +x をxに置き換え
   if (consume('+'))
     return primary();
   // -x を0-xに置き換え
   if (consume('-')) 
-    return new_binary(ND_SUB, new_node_num(0), primary());
+    return new_binary(ND_SUB, new_node_num(0), unary());
   return primary();
 }
 
