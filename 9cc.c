@@ -182,6 +182,7 @@ Node *new_num(int val) {
 
 Node *expr();
 Node *mul();
+Node *unary();
 Node *primary();
 
 // expr = ("+" mul | "-" mul)
@@ -198,18 +199,29 @@ Node *expr() {
   }
 }
 
-// mul = ("*" primary | "/" primary)
+// mul = unary ("*" unary | "/" unary)
 Node *mul() {
-  Node *node = primary();
+  Node *node = unary();
 
   for (;;) {
     if (consume('*'))
-      node = new_binary(ND_MUL, node, primary());
+      node = new_binary(ND_MUL, node, unary());
     else if (consume('/'))
-      node = new_binary(ND_DIV, node, primary());
+      node = new_binary(ND_DIV, node, unary());
     else
       return node;
   }
+}
+
+// 単項-・単項+
+Node *unary() {
+  // +x をxに置き換え
+  if (consume('+'))
+    return primary();
+  // -x を0-xに置き換え
+  if (consume('-')) 
+    return new_binary(ND_SUB, new_node_num(0), primary());
+  return primary();
 }
 
 // primary = "(" expr ")" | num
